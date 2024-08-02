@@ -12,8 +12,8 @@ end
 local settings = {
     fullscreen = false,
     screenScaler = 2,
-    logicalWidth = 320,
-    logicalHeight = 180,
+    logicalWidth = 192,
+    logicalHeight = 360,
     background_color =  {
         r = 131,
         g = 118,
@@ -34,6 +34,14 @@ spriteCordinates = {
 gameSettings = {
     speed = 30
 }
+timerLeft = 0
+counterLeft = 0
+intervalLeft = 1
+
+timerRight = 0
+counterRight = 0
+intervalRight = 0.9
+
 gameObjs = {}
 
 function love.load()
@@ -60,6 +68,25 @@ end
 function love.update(dt)
     -- Get the current window size
     calculateMouseOffsets()
+
+    timerLeft = timerLeft + dt
+    timerRight = timerRight + dt
+-- print every time 1 sec has gone
+    if timerLeft >= intervalLeft then
+        timerLeft = 0
+        print('1 sec has passsed')
+        counterLeft = counterLeft + 1
+        print (counterLeft)
+        makeNest(20)
+    end
+
+    if timerRight >= intervalRight then
+        timerRight = 0
+        print('1 sec has passsed')
+        counterRight = counterRight + 1
+        print (counterRight)
+        makeNest(140)
+    end
     -- y = y + 30 * dt
     -- gameSettings.speed = gameSettings.speed + 0.05
     for index, value in ipairs(gameObjs) do
@@ -120,7 +147,9 @@ function love.keypressed(key)
         end 
     end
     if key == 'x' then
-        makeNest()
+        makeNest((settings.logicalWidth/2)-100)
+        makeNest((settings.logicalWidth/2)+100)
+        
     end
 end
 
@@ -157,10 +186,10 @@ function loadSprite(colNumb, rowNumb)
     return quad
 end
 
-function makeNest()
+function makeNest(x)
     local nest = {
         spr = loadSprite(spriteCordinates.chickenNest.col, spriteCordinates.chickenNest.row),
-        x = 1,
+        x = x,
         y = 1
     }
     table.insert(gameObjs, nest)
