@@ -13,7 +13,12 @@ local settings = {
     fullscreen = false,
     screenScaler = 2,
     logicalWidth = 320,
-    logicalHeight = 180
+    logicalHeight = 180,
+    background_color =  {
+        r = 131,
+        g = 118,
+        b = 156
+    }
 }
 -- global mouse variables to hold correct mouse pos in the scaled world 
 mouse_x, mouse_y = ...
@@ -25,9 +30,17 @@ spriteCordinates = {
         row = 1
     }
 }
+
+gameSettings = {
+    speed = 30
+}
+gameObjs = {}
+
 function love.load()
     love.window.setTitle( 'inLove2D' )
-    sprChickenNest = loadSprite(spriteCordinates.chickenNest.col, spriteCordinates.chickenNest.row)
+    spriteSheet:setFilter("nearest", "nearest")
+
+    -- sprChickenNest = loadSprite(spriteCordinates.chickenNest.col, spriteCordinates.chickenNest.row)
 
     -- Set up the window with resizable option
     love.window.setMode(settings.logicalWidth, settings.logicalHeight, {resizable=true, vsync=0, minwidth=settings.logicalWidth*settings.screenScaler, minheight=settings.logicalHeight*settings.screenScaler})
@@ -40,14 +53,18 @@ function love.load()
     
     love.graphics.setFont(font)
     -- love.graphics.setDefaultFilter("nearest", "nearest")
-
+    love.graphics.setBackgroundColor( settings.background_color.r/255, settings.background_color.g/255, settings.background_color.b/255)
 end
 
-y = 1
+-- y = 1
 function love.update(dt)
     -- Get the current window size
     calculateMouseOffsets()
-    y = y + 30 * dt
+    -- y = y + 30 * dt
+    -- gameSettings.speed = gameSettings.speed + 0.05
+    for index, value in ipairs(gameObjs) do
+        value.y = value.y + gameSettings.speed * dt
+    end
 end
 
 
@@ -63,7 +80,9 @@ function love.draw()
     love.graphics.print("mouse: " .. mouse_x .. "," .. mouse_y, 1, 1)
     font = love.graphics.newFont('fonts/PixeloidMono.ttf', 18)
     love.graphics.setFont(font)
-    love.graphics.draw(spriteSheet, sprChickenNest, 1,y)
+    for index, value in ipairs(gameObjs) do
+        love.graphics.draw(spriteSheet, value.spr, value.x,value.y)
+    end
     love.graphics.pop()
 end
 
@@ -99,6 +118,9 @@ function love.keypressed(key)
             love.window.setMode(settings.logicalWidth, settings.logicalHeight, {resizable=true, vsync=0, minwidth=settings.logicalWidth*settings.screenScaler, minheight=settings.logicalHeight*settings.screenScaler})
             settings.fullscreen = false
         end 
+    end
+    if key == 'x' then
+        makeNest()
     end
 end
 
@@ -136,6 +158,11 @@ function loadSprite(colNumb, rowNumb)
 end
 
 function makeNest()
-
+    local nest = {
+        spr = loadSprite(spriteCordinates.chickenNest.col, spriteCordinates.chickenNest.row),
+        x = 1,
+        y = 1
+    }
+    table.insert(gameObjs, nest)
 end
 
