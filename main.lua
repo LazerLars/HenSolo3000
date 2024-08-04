@@ -28,15 +28,19 @@ spriteCordinates = {
     chickenNest = {
         col = 1,
         row = 1
+    },
+    egg =  {
+        col = 1,
+        row = 2
     }
 }
 
 gameSettings = {
-    speed = 30
+    speed = 50
 }
 timerLeft = 0
 counterLeft = 0
-intervalLeft = 1
+intervalLeft = 0.9
 
 timerRight = 0
 counterRight = 0
@@ -90,7 +94,12 @@ function love.update(dt)
     -- y = y + 30 * dt
     -- gameSettings.speed = gameSettings.speed + 0.05
     for index, value in ipairs(gameObjs) do
-        value.y = value.y + gameSettings.speed * dt
+        if value.type == "nest" then            
+            value.y = value.y + gameSettings.speed * dt
+        end
+        if value.type == "egg" then            
+            value.x = value.x + value.dir * 400 * dt
+        end
     end
 end
 
@@ -108,7 +117,12 @@ function love.draw()
     font = love.graphics.newFont('fonts/PixeloidMono.ttf', 18)
     love.graphics.setFont(font)
     for index, value in ipairs(gameObjs) do
-        love.graphics.draw(spriteSheet, value.spr, value.x,value.y)
+        if value.type == "nest" then            
+            love.graphics.draw(spriteSheet, value.spr, value.x,value.y)
+        end
+        if value.type == "egg" then
+            love.graphics.draw(spriteSheet, value.spr, value.x, value.y)
+        end
     end
     love.graphics.pop()
 end
@@ -146,10 +160,16 @@ function love.keypressed(key)
             settings.fullscreen = false
         end 
     end
-    if key == 'x' then
+    if key == 'n' then
         makeNest((settings.logicalWidth/2)-100)
         makeNest((settings.logicalWidth/2)+100)
         
+    end
+    if key == 'x' then
+        makeEgg(1)
+    end
+    if key == 'z' then
+        makeEgg(-1)
     end
 end
 
@@ -188,10 +208,23 @@ end
 
 function makeNest(x)
     local nest = {
+        type = "nest",
         spr = loadSprite(spriteCordinates.chickenNest.col, spriteCordinates.chickenNest.row),
         x = x,
         y = 1
     }
     table.insert(gameObjs, nest)
+end
+
+function makeEgg(dir)
+    local egg = {
+        type = "egg",
+        spr = loadSprite(spriteCordinates.egg.col, spriteCordinates.egg.row),
+        x = settings.logicalWidth/2,
+        y = 300,
+        dir = dir
+    }
+    table.insert(gameObjs, egg)
+    print("Making egg")
 end
 
